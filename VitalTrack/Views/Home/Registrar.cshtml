@@ -1,0 +1,44 @@
+﻿@model VitalTrack.Models.RegistroSalud
+
+<section class="view-section active">
+    <h2>Registrar datos</h2>
+    <p class="fecha-display">Fecha: @DateTime.Now.ToString("dd/MM/yyyy")</p>
+
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="feedback success" style="display: block; margin-bottom: 1.5rem;">
+            @TempData["MensajeExito"]
+        </div>
+    }
+
+    <form asp-action="GuardarRegistro" method="post" class="form-container">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label>Temperatura (°C):</label>
+            <input asp-for="Temperatura" type="number" step="0.1" class="form-control" placeholder="Ej. 36.5" required>
+        </div>
+        <div class="form-group">
+            <label>Presión Arterial (mmHg):</label>
+            <div class="input-group">
+                <input asp-for="PresionSistolica" type="number" placeholder="Sistólica" required>
+                <span>/</span>
+                <input asp-for="PresionDiastolica" type="number" placeholder="Diastólica" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Vasos de agua:</label>
+            <input asp-for="Agua" type="number" placeholder="Ej. 5" required>
+        </div>
+        <div class="form-group">
+            <label>Horas de sueño:</label>
+            <input asp-for="Sueno" type="number" step="0.5" placeholder="Ej. 7" required>
+        </div>
+        <div class="form-group">
+            <label>Actividad física (minutos):</label>
+            <input asp-for="Actividad" type="number" placeholder="Ej. 30" required>
+        </div>
+
+        <button type="submit" class="btn-primary btn-block">Guardar Datos</button>
+    </form>
+</section>

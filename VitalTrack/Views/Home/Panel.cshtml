@@ -1,0 +1,26 @@
+﻿@model VitalTrack.Models.RegistroSalud
+
+<section class="view-section active">
+    <h2>Mi salud</h2>
+    <p>Resumen de tus últimos registros</p>
+
+    <div class="cards-grid">
+        @if (Model != null)
+        {
+            <div class="card"><h3>Temperatura</h3><div class="value">@Model.Temperatura °C</div></div>
+            <div class="card"><h3>Presión</h3><div class="value">@Model.PresionSistolica/@Model.PresionDiastolica</div></div>
+            <div class="card"><h3>Hidratación</h3><div class="value">@Model.Agua vasos</div></div>
+            <div class="card"><h3>Sueño</h3><div class="value">@Model.Sueno h</div></div>
+            <div class="card"><h3>Actividad física</h3><div class="value">@Model.Actividad min</div></div>
+        }
+        else
+        {
+            <p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">No hay registros todavía. ¡Comienza a registrar tus datos!</p>
+        }
+    </div>
+
+    <div class="actions" style="margin-top: 2rem;">
+        <a asp-controller="Home" asp-action="Registrar" class="btn-primary" style="text-decoration:none;">Registrar nuevos datos</a>
+        <a asp-controller="Home" asp-action="Historial" class="btn-secondary" style="text-decoration:none;">Ver historial</a>
+    </div>
+</section>

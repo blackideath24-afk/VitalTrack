@@ -1,0 +1,107 @@
+﻿@model IEnumerable<VitalTrack.Models.RegistroSalud>
+
+<section class="view-section active">
+    <h2>Historial de salud</h2>
+
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="feedback success">@TempData["Mensaje"]</div>
+    }
+
+    <form method="get" asp-action="Historial" class="filtros-container" style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <label>Desde: <input type="date" name="desde" required></label>
+        <label style="margin-left: 1rem;">Hasta: <input type="date" name="hasta" required></label>
+        <button type="submit" class="btn-primary" style="padding: 0.4rem 1rem; font-size: 0.9rem;">Buscar</button>
+        <a asp-action="Historial" class="btn-secondary" style="margin-left: 0.5rem; padding: 0.4rem 1rem; font-size: 0.9rem; text-decoration: none; display: inline-block;">Limpiar</a>
+    </form>
+
+    <div class="table-container">
+        <table id="tabla-historial">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Temp</th>
+                    <th>Presión</th>
+                    <th>Agua</th>
+                    <th>Sueño</th>
+                    <th>Actividad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" style="text-align:center;">No hay registros para mostrar.</td></tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Temperatura °C</td>
+                            <td>@item.PresionSistolica/@item.PresionDiastolica</td>
+                            <td>@item.Agua vasos</td>
+                            <td>@item.Sueno h</td>
+                            <td>@item.Actividad min</td>
+                            <td style="display: flex; gap: 5px;">
+                                <a asp-action="Registrar" asp-route-id="@item.Id" class="btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; text-decoration:none;">Editar</a>
+                                <form asp-action="Eliminar" asp-route-id="@item.Id" method="post" onsubmit="return confirm('¿Eliminar registro?');">
+                                    <button type="submit" class="btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="chart-container" style="margin-top: 2rem;">
+        <h3>Evolución de Sueño y Actividad</h3>
+        <div style="position: relative; height: 300px; width: 100%;">
+            <canvas id="miGrafico"></canvas>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('miGrafico');
+
+            if (ctx) {
+                const chartFechas = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(m => m.Fecha.ToString("dd/MM")).Reverse()));
+                const chartSueno = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(m => m.Sueno).Reverse()));
+                const chartActividad = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(m => m.Actividad).Reverse()));
+
+                if (chartFechas.length > 0) {
+                    new Chart(ctx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: chartFechas,
+                            datasets: [
+                                {
+                                    label: 'Horas de Sueño',
+                                    data: chartSueno,
+                                    backgroundColor: '#3b82f6',
+                                    borderRadius: 4
+                                },
+                                {
+                                    label: 'Actividad (min)',
+                                    data: chartActividad,
+                                    backgroundColor: '#10b981',
+                                    type: 'line',
+                                    borderColor: '#10b981',
+                                    tension: 0.3
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                }
+            }
+        });
+</script>
